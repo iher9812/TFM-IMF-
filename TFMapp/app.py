@@ -287,7 +287,7 @@ def render_analysis_page():
     use_clean = False
     if 'clean_title' in df.columns:
         use_clean = st.toggle(
-            "Use cleaned text for the model (recommended)", 
+            "Use cleaned text for the model (not recommended)", 
             value=True, 
             key="tgl_clean_for_model"
         )
