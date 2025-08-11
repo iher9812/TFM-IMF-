@@ -282,35 +282,35 @@ def render_analysis_page():
         return
     st.write("**Model id2label mapping:**", model.config.id2label)
     
-# --- Toggle: solo decide qué columna de texto entra al modelo ---
-# Si existe 'clean_title', ofrecemos el toggle; si no, usamos la columna original.
-use_clean = False
-if 'clean_title' in df.columns:
-    use_clean = st.toggle(
-        "Use cleaned text for the model (recommended)", 
-        value=True, 
-        key="tgl_clean_for_model"
+    # --- Toggle: solo decide qué columna de texto entra al modelo ---
+    # Si existe 'clean_title', ofrecemos el toggle; si no, usamos la columna original.
+    use_clean = False
+    if 'clean_title' in df.columns:
+        use_clean = st.toggle(
+            "Use cleaned text for the model (recommended)", 
+            value=True, 
+            key="tgl_clean_for_model"
+        )
+    
+    text_for_model_col = 'clean_title' if use_clean and 'clean_title' in df.columns else text_column
+    
+    # Por si alguna noticia viene con NaN
+    df_copy = df.copy()
+    df_copy[text_for_model_col] = df_copy[text_for_model_col].fillna("").astype(str)
+    
+    # Limpieza ligera SOLO de lo que entra al modelo (no altera el df original)
+    with st.spinner("Analyzing sentiment with the BERT model..."):
+        texts_for_model = df_copy[text_for_model_col].apply(clean_for_model).tolist()
+        df_copy['sentiment_label'] = predict_sentiment_batch(
+            texts_for_model, tokenizer, model, batch_size=64
+        )
+    
+    # Conteos para el gráfico
+    sentiment_counts = (
+        df_copy['sentiment_label']
+        .value_counts()
+        .reindex(['Positive', 'Neutral', 'Negative'], fill_value=0)
     )
-
-text_for_model_col = 'clean_title' if use_clean and 'clean_title' in df.columns else text_column
-
-# Por si alguna noticia viene con NaN
-df_copy = df.copy()
-df_copy[text_for_model_col] = df_copy[text_for_model_col].fillna("").astype(str)
-
-# Limpieza ligera SOLO de lo que entra al modelo (no altera el df original)
-with st.spinner("Analyzing sentiment with the BERT model..."):
-    texts_for_model = df_copy[text_for_model_col].apply(clean_for_model).tolist()
-    df_copy['sentiment_label'] = predict_sentiment_batch(
-        texts_for_model, tokenizer, model, batch_size=64
-    )
-
-# Conteos para el gráfico
-sentiment_counts = (
-    df_copy['sentiment_label']
-    .value_counts()
-    .reindex(['Positive', 'Neutral', 'Negative'], fill_value=0)
-)
     # Realiza el análisis (limpieza suave SOLO al texto que entra a BERT)
     with st.spinner("Analyzing sentiment with the BERT model..."):
         df_copy = df.copy()
