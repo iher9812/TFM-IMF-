@@ -59,18 +59,22 @@ def _id2label(model):
 
 # --- Clasificación ---
 def classify_sentiment_bert(text, tokenizer, model):
-    if not isinstance(text, str) or not text.strip(): return "Neutral"
+    if not isinstance(text, str) or not text.strip():
+        return "Neutral"
     inputs = tokenizer(text, padding=True, truncation=True, max_length=160, return_tensors="pt")
     with torch.no_grad():
         pred = torch.argmax(model(**inputs).logits, dim=1).item()
-    return sentiment_map.get(pred, "Neutral")
+    id2label = _id2label(model)
+    return id2label.get(pred, "Neutral")
 
 def predict_sentiment_batch(texts, tokenizer, model, batch_size=64):
+    id2label = _id2label(model)
     labels = []
     for i in range(0, len(texts), batch_size):
         batch = texts[i:i+batch_size]
         inputs = tokenizer(batch, padding=True, truncation=True, max_length=160, return_tensors="pt")
         with torch.no_grad():
             preds = torch.argmax(model(**inputs).logits, dim=1).tolist()
-        labels.extend([sentiment_map.get(p, "Neutral") for p in preds])
+        labels.extend([id2label.get(p, "Neutral") for p in preds])
     return labels
+
