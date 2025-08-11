@@ -20,7 +20,6 @@ sys.path.append(os.path.dirname(__file__))  # añade TFMapp al sys.path si hicie
 from kaggle_page import render_kaggle_page
 
 from utils_nlp import (
-    load_model as core_load_model,
     clean_for_model,
     limpiar_texto_dataset,
     predict_sentiment_batch,
@@ -69,13 +68,6 @@ st.markdown("""
     hr { border-top: 1px solid #333; }
 </style>
 """, unsafe_allow_html=True)
-
-# --- 3) MODEL / NLP UTILS ---
-# --- 3) MODEL / NLP UTILS ---
-@st.cache_resource
-def load_model():
-    # Si tu modelo está en otra carpeta, cámbialo aquí.
-    return core_load_model("sentiment_model_full_offline")
 
 
 # --- 4) NEWS HELPERS ---
@@ -278,7 +270,7 @@ def render_analysis_page():
         return
 
     # Model
-    tokenizer, model = load_model()
+    tokenizer, model = get_model()
     if not tokenizer or not model:
         st.warning("Model not loaded. Cannot continue.")
         return
@@ -402,7 +394,7 @@ elif st.session_state.page == 'view_news':
     render_footer()
 elif st.session_state.page == 'kaggle':
     # IMPORTANTE: tu kaggle_page espera tokenizer y model
-    tokenizer, model = load_model()
+    tokenizer, model = get_model()
     if tokenizer and model:
         render_kaggle_page(tokenizer, model)
         render_footer()
