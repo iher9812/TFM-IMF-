@@ -221,9 +221,14 @@ def render_view_news_page():
                 with st.spinner(f"Running News_DATA pipeline for {selected_airline}..."):
                     df_clean, csv_path = get_airline_news_clean(selected_airline)
                 text_col = 'text' if 'text' in df_clean.columns else 'title'
+# Asegura 'clean_title' para mostrar el toggle en análisis
+                if 'clean_title' not in df_clean.columns and text_col in df_clean.columns:
+                    df_clean['clean_title'] = df_clean[text_col].astype(str).apply(limpiar_texto_dataset)
+                
                 st.success(f"CSV cleaned and saved: {csv_path}")
                 st.session_state.data_to_analyze = df_clean
                 st.session_state.text_column = text_col
+                
             else:
                 # Fallback simple si no está News_DATA.py
                 records = []
