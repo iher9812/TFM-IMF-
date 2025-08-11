@@ -7,4 +7,9 @@ matplotlib
 wordcloud
 feedparser
 plotly
+
 kagglehub
+
+transformers>=4.40
+torch>=2.2
+huggingface_hub>=0.23
