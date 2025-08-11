@@ -23,7 +23,10 @@ from utils_nlp import (
     predict_sentiment_batch,
 )
 #  ---- Importación de modelo
-from utils_nlp import load_model_hf
+try:
+    from TFMapp.utils_nlp import load_model_hf  # cuando se ejecuta desde la raíz del repo (Streamlit Cloud)
+except ModuleNotFoundError:
+    from utils_nlp import load_model_hf          # cuando ejecutas dentro de TFMapp localmente
 
 @st.cache_resource(show_spinner="Cargando modelo...")
 def load_model():
