@@ -13,6 +13,9 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 
+import sys, os
+sys.path.append(os.path.dirname(__file__))  # añade TFMapp al sys.path si hiciera falta
+
 # Importa la página de Kaggle desde tu módulo separado (requiere tokenizer, model)
 from kaggle_page import render_kaggle_page
 
