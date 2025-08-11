@@ -1,8 +1,6 @@
 # utils_nlp.py
 import re, html, unicodedata
 import torch
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-
 from pathlib import Path
 from huggingface_hub import snapshot_download
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
@@ -17,8 +15,8 @@ def load_model_hf(repo_id: str):
     )
     tokenizer = AutoTokenizer.from_pretrained(local_dir)
     model = AutoModelForSequenceClassification.from_pretrained(local_dir)
+    model.eval()
     return tokenizer, model
-
 
 URL_RE = re.compile(r'(https?://\S+|www\.\S+)')
 sentiment_map = {0: "Negative", 1: "Neutral", 2: "Positive"}
@@ -36,12 +34,6 @@ def limpiar_texto_dataset(texto: str) -> str:
     t = URL_RE.sub('', t)
     t = re.sub(r"[^a-z0-9\s]", " ", t)
     return re.sub(r"\s+", " ", t).strip()
-
-def load_model(model_path="sentiment_model_full_offline"):
-    tokenizer = AutoTokenizer.from_pretrained(model_path)
-    model = AutoModelForSequenceClassification.from_pretrained(model_path)
-    model.eval()
-    return tokenizer, model
 
 def classify_sentiment_bert(text, tokenizer, model):
     if not isinstance(text, str) or not text.strip(): return "Neutral"
