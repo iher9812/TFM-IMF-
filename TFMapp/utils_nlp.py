@@ -18,6 +18,8 @@ def load_model_hf(repo_id: str):
     model.eval()
     return tokenizer, model
 
+# --- Limpieza de texto ---
+
 URL_RE = re.compile(r'(https?://\S+|www\.\S+)')
 sentiment_map = {0: "Negative", 1: "Neutral", 2: "Positive"}
 
@@ -34,7 +36,28 @@ def limpiar_texto_dataset(texto: str) -> str:
     t = URL_RE.sub('', t)
     t = re.sub(r"[^a-z0-9\s]", " ", t)
     return re.sub(r"\s+", " ", t).strip()
+# --- Mapeo dinámico de id -> etiqueta ---
 
+def _id2label(model):
+    raw = getattr(model.config, "id2label", {}) or {}
+    m = {int(k): str(v) for k, v in raw.items()}
+    if not m:
+        m = {0: "Negative", 1: "Neutral", 2: "Positive"}
+    # Normaliza nombres
+    norm = {}
+    for k, v in m.items():
+        vlow = v.lower()
+        if "neg" in vlow:
+            norm[k] = "Negative"
+        elif "neu" in vlow:
+            norm[k] = "Neutral"
+        elif "pos" in vlow:
+            norm[k] = "Positive"
+        else:
+            norm[k] = v.capitalize()
+    return norm
+
+# --- Clasificación ---
 def classify_sentiment_bert(text, tokenizer, model):
     if not isinstance(text, str) or not text.strip(): return "Neutral"
     inputs = tokenizer(text, padding=True, truncation=True, max_length=160, return_tensors="pt")
