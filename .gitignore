@@ -1,0 +1,21 @@
+# Entornos y cachés
+TFMapp/venv/
+**/__pycache__/
+.ipynb_checkpoints/
+*.pyc
+
+# Archivos locales
+.env
+.DS_Store
+
+# Modelos/pesados comunes (si los tienes)
+*.pt
+*.pth
+*.bin
+*.h5
+*.zip
+*.onnx
+# Pesados específicos del proyecto
+BERTmodel/sentiment_model_full_offline.zip
+TFMapp/sentiment_model_full_offline/
+*.safetensors
