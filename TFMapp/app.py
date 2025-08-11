@@ -280,6 +280,8 @@ def render_analysis_page():
     if not tokenizer or not model:
         st.warning("Model not loaded. Cannot continue.")
         return
+    st.write("**Model id2label mapping:**", model.config.id2label)
+
 
     # --- Toggle para decidir qué texto alimentar a BERT ---
     has_clean_col = 'clean_title' in df.columns
