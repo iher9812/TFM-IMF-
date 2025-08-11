@@ -22,6 +22,12 @@ from utils_nlp import (
     limpiar_texto_dataset,
     predict_sentiment_batch,
 )
+#  ---- Importación de modelo
+from utils_nlp import load_model_hf
+
+@st.cache_resource(show_spinner="Cargando modelo...")
+def load_model():
+    return load_model_hf("iher9812/sentiment_model_full_offline")
 
 # ---- Optional: import from News_DATA with safe fallbacks (solo para Noticias)
 try:
