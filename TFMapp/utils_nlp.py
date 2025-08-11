@@ -3,6 +3,23 @@ import re, html, unicodedata
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
+from pathlib import Path
+from huggingface_hub import snapshot_download
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+
+BASE_DIR = Path(__file__).resolve().parent  # TFMapp/
+
+def load_model_hf(repo_id: str):
+    local_dir = snapshot_download(
+        repo_id=repo_id,
+        local_dir=BASE_DIR / "hf_model_cache",
+        allow_patterns=["*.json", "*.txt", "*.safetensors"]
+    )
+    tokenizer = AutoTokenizer.from_pretrained(local_dir)
+    model = AutoModelForSequenceClassification.from_pretrained(local_dir)
+    return tokenizer, model
+
+
 URL_RE = re.compile(r'(https?://\S+|www\.\S+)')
 sentiment_map = {0: "Negative", 1: "Neutral", 2: "Positive"}
 
