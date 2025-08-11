@@ -5,7 +5,6 @@ Streamlit App with BERT Sentiment Analysis
 
 import os
 from datetime import datetime, timezone
-
 import streamlit as st
 import pandas as pd
 import feedparser
@@ -23,7 +22,7 @@ except ModuleNotFoundError:
     from utils_nlp import load_model_hf          # cuando ejecutas dentro de TFMapp localmente
 
 @st.cache_resource(show_spinner="Cargando modelo...")
-def load_model():
+def load_model_cached():
     return load_model_hf("iher9812/sentiment_model_full_offline")
 
 
@@ -272,7 +271,7 @@ def render_analysis_page():
         return
 
     # Model
-    tokenizer, model = get_model()
+    tokenizer, model = load_model_cached()
     if not tokenizer or not model:
         st.warning("Model not loaded. Cannot continue.")
         return
@@ -396,7 +395,7 @@ elif st.session_state.page == 'view_news':
     render_footer()
 elif st.session_state.page == 'kaggle':
     # IMPORTANTE: tu kaggle_page espera tokenizer y model
-    tokenizer, model = get_model()
+    tokenizer, model = load_model_cached()
     if tokenizer and model:
         render_kaggle_page(tokenizer, model)
         render_footer()
