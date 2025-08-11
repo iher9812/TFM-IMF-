@@ -298,19 +298,6 @@ def render_analysis_page():
     df_copy = df.copy()
     df_copy[text_for_model_col] = df_copy[text_for_model_col].fillna("").astype(str)
     
-    # Limpieza ligera SOLO de lo que entra al modelo (no altera el df original)
-    with st.spinner("Analyzing sentiment with the BERT model..."):
-        texts_for_model = df_copy[text_for_model_col].apply(clean_for_model).tolist()
-        df_copy['sentiment_label'] = predict_sentiment_batch(
-            texts_for_model, tokenizer, model, batch_size=64
-        )
-    
-    # Conteos para el gráfico
-    sentiment_counts = (
-        df_copy['sentiment_label']
-        .value_counts()
-        .reindex(['Positive', 'Neutral', 'Negative'], fill_value=0)
-    )
     # Realiza el análisis (limpieza suave SOLO al texto que entra a BERT)
     with st.spinner("Analyzing sentiment with the BERT model..."):
         df_copy = df.copy()
