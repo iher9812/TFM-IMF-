@@ -38,22 +38,29 @@ def limpiar_texto_dataset(texto: str) -> str:
     return re.sub(r"\s+", " ", t).strip()
 # --- Mapeo dinámico de id -> etiqueta ---
 
-# --- helpers ---
+# --- Mapeo id -> etiqueta robusto ---
 def _id2label(model):
-    raw = getattr(model.config, "id2label", {})
-    return {int(k): str(v) for k, v in raw.items()}  # keys pueden venir como str
+    """Devuelve un mapeo {0,1,2} -> {'Negative','Neutral','Positive'}.
 
-def _canonize(lbl: str) -> str:
-    if not lbl:
-        return "Neutral"
-    t = lbl.strip().lower()
-    if "pos" in t: return "Positive"
-    if "neg" in t: return "Negative"
-    if "neu" in t: return "Neutral"
-    # Si tu modelo trae LABEL_0/1/2 y no hay pistas, caerá aquí:
-    return lbl.title()
+    Si el config trae LABEL_0/1/2 u otros nombres sin 'pos/neg/neu', 
+    cae al orden de tu entrenamiento: 0 Neg, 1 Neu, 2 Pos.
+    """
+    raw = getattr(model.config, "id2label", {}) or {}
+    m = {int(k): str(v) for k, v in raw.items()}
+    # ¿El config ya viene bien?
+    joined = " ".join(m.values()).lower()
+    if any(s in joined for s in ("pos", "neg", "neu")) and set(m.keys()) == {0,1,2}:
+        norm = {}
+        for k, v in m.items():
+            vlow = v.lower()
+            if "neg" in vlow: norm[k] = "Negative"
+            elif "neu" in vlow: norm[k] = "Neutral"
+            elif "pos" in vlow: norm[k] = "Positive"
+            else: norm[k] = v.capitalize()
+        return norm
+    # Fallback (tu orden de entrenamiento)
+    return {0: "Negative", 1: "Neutral", 2: "Positive"}
 
-# --- Clasificación (single) ---
 def classify_sentiment_bert(text, tokenizer, model):
     if not isinstance(text, str) or not text.strip():
         return "Neutral"
@@ -61,9 +68,8 @@ def classify_sentiment_bert(text, tokenizer, model):
     with torch.no_grad():
         pred = torch.argmax(model(**inputs).logits, dim=1).item()
     id2label = _id2label(model)
-    return _canonize(id2label.get(pred, "Neutral"))
+    return id2label.get(pred, "Neutral")
 
-# --- Clasificación (batch) ---
 def predict_sentiment_batch(texts, tokenizer, model, batch_size=64):
     id2label = _id2label(model)
     out = []
@@ -72,5 +78,5 @@ def predict_sentiment_batch(texts, tokenizer, model, batch_size=64):
         inputs = tokenizer(batch, padding=True, truncation=True, max_length=160, return_tensors="pt")
         with torch.no_grad():
             preds = torch.argmax(model(**inputs).logits, dim=1).tolist()
-        out.extend([_canonize(id2label.get(p, "Neutral")) for p in preds])
+        out.extend([id2label.get(p, "Neutral") for p in preds])
     return out
