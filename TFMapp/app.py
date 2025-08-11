@@ -16,14 +16,6 @@ from wordcloud import WordCloud
 import sys, os
 sys.path.append(os.path.dirname(__file__))  # añade TFMapp al sys.path si hiciera falta
 
-# Importa la página de Kaggle desde tu módulo separado (requiere tokenizer, model)
-from kaggle_page import render_kaggle_page
-
-from utils_nlp import (
-    clean_for_model,
-    limpiar_texto_dataset,
-    predict_sentiment_batch,
-)
 #  ---- Importación de modelo
 try:
     from TFMapp.utils_nlp import load_model_hf  # cuando se ejecuta desde la raíz del repo (Streamlit Cloud)
@@ -33,6 +25,16 @@ except ModuleNotFoundError:
 @st.cache_resource(show_spinner="Cargando modelo...")
 def load_model():
     return load_model_hf("iher9812/sentiment_model_full_offline")
+
+
+# Importa la página de Kaggle desde tu módulo separado (requiere tokenizer, model)
+from kaggle_page import render_kaggle_page
+
+from utils_nlp import (
+    clean_for_model,
+    limpiar_texto_dataset,
+    predict_sentiment_batch,
+)
 
 # ---- Optional: import from News_DATA with safe fallbacks (solo para Noticias)
 try:
