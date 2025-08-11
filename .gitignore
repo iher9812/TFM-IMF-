@@ -17,5 +17,5 @@ TFMapp/venv/
 *.onnx
 # Pesados específicos del proyecto
 BERTmodel/sentiment_model_full_offline.zip
-TFMapp/sentiment_model_full_offline/
-*.safetensors
+#TFMapp/sentiment_model_full_offline/
+.safetensors

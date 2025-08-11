@@ -1,11 +1,26 @@
-pip install streamlit plotly nltk
-pip install wordcloud
-pip install feedparser
+# TFM: Streamlit Airline Sentiment Analysis
 
-Comando de ejecución 
+BERT + Streamlit para analizar sentimiento en noticias/tweets de aerolíneas.
 
-python -m streamlit run streamlit_airline_sentiment_analysis_app.py --server.headless true
+## Requisitos
+- Python 3.11
+- Ver `requirements.txt`
+
+## Instalación (local)
+python -m venv .venv
+. .venv/Scripts/activate   # Windows
+pip install -r requirements.txt
+
+## Ejecutar (local)
+streamlit run TFMapp/app.py
+
+python -m streamlit run 'app.py' --server.headless true
 
 
+## Despliegue (Streamlit Cloud)
+Elige `TFMapp/app.py` como Main file. La app descarga/carga el modelo según README_models.md.
 
-python -m streamlit run 'streamlit_app_(redesigned).py' --server.headless true
+## Estructura
+- TFMapp/ … app.py y utilidades
+- BERTmodel/ … (material del modelo)
+- DatasetNEWS/ … datos/notebooks
