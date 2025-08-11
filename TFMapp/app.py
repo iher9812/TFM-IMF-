@@ -280,7 +280,7 @@ def render_analysis_page():
     if not tokenizer or not model:
         st.warning("Model not loaded. Cannot continue.")
         return
-    st.write("**Model id2label mapping:**", model.config.id2label)
+    #st.write("**Model id2label mapping:**", model.config.id2label)
     
     # --- Toggle: solo decide qué columna de texto entra al modelo ---
     # Si existe 'clean_title', ofrecemos el toggle; si no, usamos la columna original.
